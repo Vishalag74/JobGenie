@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 function RoleSelectionPage() {
     const [selectedRole, setSelectedRole] = useState('');
     const [customRole, setCustomRole] = useState('');
+    const [difficulty, setDifficulty] = useState('Beginner');
     const navigate = useNavigate();
 
     const commonRoles = [
@@ -21,7 +22,7 @@ function RoleSelectionPage() {
     const handleStart = () => {
         const role = customRole || selectedRole;
         if (role) {
-            navigate('/questions', { state: { role } });
+            navigate('/questions', { state: { role, difficulty } });
         }
     };
 
@@ -33,6 +34,21 @@ function RoleSelectionPage() {
                 </h1>
 
                 <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 md:p-8">
+                    <div className="mb-6">
+                        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 items-center">
+                            <button className="font-bold text-gray-900 p-3 md:p-4 rounded-lg border-2 text-sm md:text-base border-none">Difficulty Level:</button>
+                            <select
+                                value={difficulty}
+                                onChange={(e) => setDifficulty(e.target.value)}
+                                className="md:col-span-2 p-3 border border-blue-500 bg-blue-50 text-blue-700 rounded-lg text-sm md:text-base focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value="Beginner">Beginner - Basic concepts</option>
+                                <option value="Intermediate">Intermediate - Standard questions</option>
+                                <option value="Advanced">Advanced - Complex topics</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 mb-6">
                         {commonRoles.map((role) => (
                             <button
@@ -42,8 +58,8 @@ function RoleSelectionPage() {
                                     setCustomRole('');
                                 }}
                                 className={`p-3 md:p-4 rounded-lg border-2 text-sm md:text-base transition-all ${selectedRole === role
-                                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                                        : 'border-gray-200 hover:border-gray-300'
+                                    ? 'border-blue-500 bg-blue-50 text-blue-700'
+                                    : 'border-gray-200 hover:border-gray-300'
                                     }`}
                             >
                                 {role}

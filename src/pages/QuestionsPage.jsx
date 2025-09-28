@@ -6,7 +6,7 @@ import { generateInterviewQuestions } from '../services/apiService';
 function QuestionsPage() {
     const location = useLocation();
     const navigate = useNavigate();
-    const { role } = location.state || {};
+    const { role, difficulty = 'Beginner' } = location.state || {};
     const [questions, setQuestions] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [answers, setAnswers] = useState({});
@@ -22,7 +22,7 @@ function QuestionsPage() {
         const loadQuestions = async () => {
             try {
                 setLoading(true);
-                const generatedQuestions = await generateInterviewQuestions(role, 5);
+                const generatedQuestions = await generateInterviewQuestions(role, 5, difficulty);
                 setQuestions(generatedQuestions);
                 setError(null);
             } catch (err) {

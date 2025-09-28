@@ -2,9 +2,9 @@ const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.VITE_GEMI
 
 const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
 
-export const generateInterviewQuestions = async (role, count = 5) => {
-  const prompt = `Generate ${count} relevant interview questions for a ${role} position. 
-  Make them specific to the role and include a mix of technical, behavioral, and situational questions. 
+export const generateInterviewQuestions = async (role, count = 5, difficulty = 'Beginner') => {
+  const prompt = `Generate ${count} ${difficulty.toLowerCase()}-level interview questions for a ${role} position.
+  Make them specific to the role and include a mix of technical, behavioral, and situational questions appropriate for ${difficulty.toLowerCase()} candidates.
   Return ONLY a JSON array, nothing else. Format:
   [{"id": 1, "text": "Question here"}, {"id": 2, "text": "Another question"}]`;
 

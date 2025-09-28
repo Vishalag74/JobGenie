@@ -92,7 +92,7 @@ function FeedbackPage() {
 
                     <div className="text-center mt-6 md:mt-8">
                         <Link
-                            to="/"
+                            to="/role-selection"
                             className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 text-sm md:text-base"
                         >
                             Practice Again
