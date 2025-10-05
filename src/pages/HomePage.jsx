@@ -9,7 +9,7 @@ function HomePage() {
                 alt="Hero Background"
                 className="absolute inset-0 w-full h-full object-cover z-0"
             />
-            <div className="relative z-20 max-w-6xl flex flex-col md:flex-row items-center md:items-start px-6 sm:px-12">
+            <div className="relative z-20 max-w-6xl flex flex-col md:flex-row items-center md:items-start">
                 <div className="md:flex-1 text-left text-gray-900 ">
                     <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold mb-6 sm:mb-8 leading-tight">
                         Welcome to <span className="text-blue-700">JobGenie</span>
@@ -22,7 +22,7 @@ function HomePage() {
                             to="/role-selection"
                             className=" bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 md:px-8 md:py-4 rounded-lg text-base md:text-lg font-semibold transition-transform duration-200 hover:scale-105 inline-block shadow-lg"
                         >
-                            🚀 Start Interview Practice
+                            Get Started 🚀 
                         </Link>
                     </div>
                 </div>
