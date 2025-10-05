@@ -27,10 +27,10 @@ function RoleSelectionPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 flex items-center justify-center">
+        <div className="min-h-screen bg-gradient-to-br from-blue-200 via-blue-300 to-blue-500 p-4 flex items-center justify-center">
             <div className="max-w-4xl mx-auto w-full">
                 <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-6 md:mb-8 text-gray-900">
-                    <span className="text-blue-600">Select </span>Your Role
+                    Select <span className="text-blue-600">Your Role</span>
                 </h1>
 
                 <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 md:p-8">

@@ -38,7 +38,7 @@ function QuestionsPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+            <div className="min-h-screen bg-gradient-to-br from-blue-200 via-blue-300 to-blue-500 p-4">
                 <div className="min-h-screen flex items-center justify-center">
                     <div className="text-3xl text-blue-600">Loading questions...</div>
                 </div>
@@ -50,7 +50,7 @@ function QuestionsPage() {
     const progress = ((currentIndex + 1) / questions.length) * 100;
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-gradient-to-br from-blue-200 via-blue-300 to-blue-500 flex items-center justify-center p-4">
             <div className="max-w-3xl mx-auto w-full">
                 <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-6 md:mb-8 text-gray-900">
                     <span className="text-blue-600">{role}</span> Interview
