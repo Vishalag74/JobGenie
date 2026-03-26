@@ -1,12 +1,14 @@
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.VITE_GEMINI_API_KEY;
 
-const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
 
 export const generateInterviewQuestions = async (role, count = 5, difficulty = 'Beginner') => {
-  const prompt = `Generate ${count} ${difficulty.toLowerCase()}-level interview questions for a ${role} position.
-  Make them specific to the role and include a mix of technical, behavioral, and situational questions appropriate for ${difficulty.toLowerCase()} candidates.
-  Return ONLY a JSON array, nothing else. Format:
-  [{"id": 1, "text": "Question here"}, {"id": 2, "text": "Another question"}]`;
+  const prompt = `You MUST return ONLY valid JSON array format. No markdown, no explanation, no extra text.
+Generate exactly ${count} ${difficulty.toLowerCase()}-level interview questions for a ${role} position.
+Output format MUST be:
+[{"text": "Question 1 here"}, {"text": "Question 2 here"}, {"text": "Question 3 here"}, {"text": "Question 4 here"}, {"text": "Question 5 here"}]
+
+Return ONLY this JSON array. Do not add code blocks, explanations, or any text outside the array.`;
 
   const response = await fetch(GEMINI_API_URL, {
     method: 'POST',
@@ -36,17 +38,98 @@ export const generateInterviewQuestions = async (role, count = 5, difficulty = '
     .replace(/^\s*{\s*|\s*}\s*$/g, (m) => m.includes("{") ? "[" : "]"); // in case AI wraps with {}
 
   let questions = [];
-  try {
-    questions = JSON.parse(generatedText);
-  } catch (err) {
-    console.warn("⚠️ JSON parse failed, fallback to line-split mode.");
-    questions = generatedText
-      .split("\n")
-      .filter(q => q.trim())
-      .map((q, i) => ({ id: i + 1, text: q }));
+  const parseJsonSafe = (text) => {
+    try {
+      return JSON.parse(text);
+    } catch {
+      return null;
+    }
+  };
+
+  questions = parseJsonSafe(generatedText);
+
+  if (!questions) {
+    // attempt to extract the array from any surrounding text
+    const arrayMatch = generatedText.match(/\[([\s\S]*)\]/);
+    if (arrayMatch) {
+      questions = parseJsonSafe(arrayMatch[0]);
+    }
   }
 
-  return questions.slice(0, count); // only first N questions
+  const tryExtractQuestionsFromBlock = (text) => {
+    if (!text || typeof text !== 'string') return null;
+
+    const objectCandidates = Array.from(text.matchAll(/\{[\s\S]*?\}/g)).map(m => m[0]);
+    const parsedObjects = objectCandidates
+      .map((candidate) => {
+        const js = parseJsonSafe(candidate);
+        return js && js.text ? js : null;
+      })
+      .filter(Boolean);
+
+    if (parsedObjects.length >= 1) {
+      return parsedObjects;
+    }
+
+    const textMatches = Array.from(text.matchAll(/(?:"|')?text(?:"|')?\s*:\s*(?:"|')([^"']{5,})(?:"|')/gi));
+    if (textMatches.length >= 1) {
+      return textMatches.map((m, i) => ({ id: i+1, text: m[1].trim() }));
+    }
+
+    return null;
+  };
+
+  if ((!questions || !questions.length) && generatedText) {
+    const extract = tryExtractQuestionsFromBlock(generatedText);
+    if (extract) {
+      questions = extract;
+    }
+  }
+
+  const normalizeQuestions = (rawArray) => {
+    return (Array.isArray(rawArray) ? rawArray : [])
+      .map((q, i) => {
+        if (!q || typeof q !== 'object') return null;
+        const text = typeof q.text === 'string' ? q.text.trim() : '';
+        return text.length > 0 ? { id: i + 1, text } : null;
+      })
+      .filter(Boolean)
+      .map((q, i) => ({ ...q, id: i + 1 }));
+  };
+
+  if (questions) {
+    questions = normalizeQuestions(questions);
+  }
+
+  if (!questions || questions.length < count) {
+    console.warn("⚠️ Insufficient questions from JSON, attempting extraction...");
+    const lines = generatedText
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter((line) => line.length > 10 && !/^[\[\]{}",:\s]/.test(line));
+
+    if (lines.length >= count) {
+      questions = lines.slice(0, count).map((text, i) => ({ id: i + 1, text }));
+    } else {
+      const objectMatches = generatedText.match(/\{"text"\s*:\s*"([^"]+)"/gi) || [];
+      if (objectMatches.length >= count) {
+        questions = objectMatches.slice(0, count).map((match, i) => ({
+          id: i + 1,
+          text: match.replace(/\{"text"\s*:\s*"/, '').replace(/"$/, '')
+        }));
+      }
+    }
+  }
+
+  if (!Array.isArray(questions)) {
+    throw new Error('Invalid question format returned from API');
+  }
+
+  if (questions.length < count) {
+    throw new Error(`Expected ${count} questions but only got ${questions.length}. Please try again.`);
+  }
+
+  return questions.slice(0, count);
 };
 
 export const generateFeedback = async (role, answers) => {

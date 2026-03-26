@@ -23,10 +23,14 @@ function QuestionsPage() {
             try {
                 setLoading(true);
                 const generatedQuestions = await generateInterviewQuestions(role, 5, difficulty);
+                if (!generatedQuestions || generatedQuestions.length !== 5) {
+                    throw new Error('Invalid question count received');
+                }
                 setQuestions(generatedQuestions);
                 setError(null);
             } catch (err) {
-                setError('Failed to load questions. Please try again.');
+                console.error('Question generation error:', err);
+                setError(err.message || 'Failed to load questions. Please try again.');
                 setQuestions([]);
             } finally {
                 setLoading(false);
